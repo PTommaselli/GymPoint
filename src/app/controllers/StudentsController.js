@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 
 import Students from '../models/Students';
+import User from '../models/User';
 
 class StudentsController {
   async store(req, res) {
@@ -13,6 +14,11 @@ class StudentsController {
       weight: Yup.string().required(),
       height: Yup.string().required(),
     });
+
+    const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
+    if (!isAdm) {
+      return res.status(401).json({ error: "You aren't adiministrator" });
+    }
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fail' });
@@ -50,6 +56,11 @@ class StudentsController {
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fail' });
+    }
+
+    const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
+    if (!isAdm) {
+      return res.status(401).json({ error: "You aren't adiministrator" });
     }
 
     const { email } = req.body;
