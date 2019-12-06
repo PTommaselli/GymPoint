@@ -4,6 +4,20 @@ import Students from '../models/Students';
 import User from '../models/User';
 
 class StudentsController {
+  async index(req, res) {
+    const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
+    if (!isAdm) {
+      return res.status(401).json({ error: "You aren't administrator" });
+    }
+
+    const students = await Students.findAll({
+      where: { canceled_at: null },
+      order: ['id'],
+    });
+
+    return res.json(students);
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
@@ -66,17 +80,32 @@ class StudentsController {
 
     const { email } = req.body;
 
-    const students = await Students.findByPk(req.userId);
+    const studentExists = await Students.findOne({
+      where: {
+        id: req.params.id,
+        canceled_at: null,
+      },
+    });
 
-    if (email !== students.email) {
-      const userExists = await Students.findOne({ where: { email } });
+    if (!studentExists) {
+      return res.status(400).json({ error: 'Students not exists' });
+    }
 
-      if (userExists) {
-        return res.status(400).json({ error: 'User already exists' });
+    if (studentExists.canceled_at !== null) {
+      return res.status(400).json({ error: 'Students was cancelled' });
+    }
+
+    if (email === studentExists.email) {
+      const studentEmail = await Students.findOne({ where: { email } });
+
+      if (!studentEmail) {
+        return res.status(400).json({ error: 'Email be already used' });
       }
     }
 
-    const { id, name, age, weight, height } = await students.update(req.body);
+    const { id, name, age, weight, height } = await studentExists.update(
+      req.body
+    );
     return res.json({
       id,
       name,
@@ -85,6 +114,27 @@ class StudentsController {
       weight,
       height,
     });
+  }
+
+  async delete(req, res) {
+    const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
+    if (!isAdm) {
+      return res.status(401).json({ error: "You aren't administrator" });
+    }
+
+    const student = await Students.findOne({
+      where: { id: req.params.id, canceled_at: null },
+    });
+
+    if (!student) {
+      return res.status(400).json({ error: 'Student does not exists' });
+    }
+
+    student.canceled_at = new Date();
+
+    await student.save();
+
+    return res.json(student);
   }
 }
 

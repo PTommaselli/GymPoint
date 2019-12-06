@@ -10,6 +10,7 @@ class Students extends Model {
         adm: Sequelize.BOOLEAN,
         weight: Sequelize.STRING,
         height: Sequelize.STRING,
+        canceled_at: Sequelize.DATE,
       },
       {
         sequelize,

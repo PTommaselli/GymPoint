@@ -6,6 +6,7 @@ class Enrollments extends Model {
       {
         start_date: Sequelize.DATE,
         end_date: Sequelize.DATE,
+        canceled_at: Sequelize.DATE,
         price: Sequelize.DECIMAL,
       },
       {
@@ -16,7 +17,10 @@ class Enrollments extends Model {
   }
 
   static associate(models) {
-    this.belongsTo(models.Sudents, { foreignKey: 'student_id', as: 'student' });
+    this.belongsTo(models.Students, {
+      foreignKey: 'student_id',
+      as: 'student',
+    });
     this.belongsTo(models.Plans, { foreignKey: 'plan_id', as: 'plan' });
   }
 }
