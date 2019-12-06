@@ -14,10 +14,6 @@ class Plans extends Model {
     );
     return this;
   }
-
-  static associate(models) {
-    this.hasOne(models.Plans, { foreignKey: 'plans_id' });
-  }
 }
 
 export default Plans;

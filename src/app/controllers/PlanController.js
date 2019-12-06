@@ -25,7 +25,7 @@ class PlanController {
 
     const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
     if (!isAdm) {
-      return res.status(401).json({ error: "You aren't adiministrator" });
+      return res.status(401).json({ error: "You aren't administrator" });
     }
 
     const { title, duration, price } = await Plans.create(req.body);
@@ -43,18 +43,18 @@ class PlanController {
       price: Yup.number(),
     });
 
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fail' });
+    }
+
     const planExists = await Plans.findOne({ where: { id: req.params.id } });
     if (!planExists) {
       return res.status(400).json({ error: 'Plan does not exists' });
     }
 
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fail' });
-    }
-
     const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
     if (!isAdm) {
-      return res.status(401).json({ error: "You aren't adiministrator" });
+      return res.status(401).json({ error: "You aren't administrator" });
     }
 
     const { id, title, duration, price } = await planExists.update(req.body);
@@ -74,7 +74,7 @@ class PlanController {
 
     const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
     if (!isAdm) {
-      return res.status(401).json({ error: "You aren't adiministrator" });
+      return res.status(401).json({ error: "You aren't administrator" });
     }
 
     await planExists.destroy();

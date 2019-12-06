@@ -15,13 +15,14 @@ class StudentsController {
       height: Yup.string().required(),
     });
 
-    const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
-    if (!isAdm) {
-      return res.status(401).json({ error: "You aren't adiministrator" });
-    }
-
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fail' });
+    }
+
+    const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
+
+    if (!isAdm) {
+      return res.status(401).json({ error: "You aren't administrator" });
     }
 
     const userExists = await Students.findOne({
@@ -60,7 +61,7 @@ class StudentsController {
 
     const isAdm = await User.findOne({ where: { id: req.userId, adm: true } });
     if (!isAdm) {
-      return res.status(401).json({ error: "You aren't adiministrator" });
+      return res.status(401).json({ error: "You aren't administrator" });
     }
 
     const { email } = req.body;
