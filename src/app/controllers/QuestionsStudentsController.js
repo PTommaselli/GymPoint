@@ -1,7 +1,7 @@
-import Checkins from '../models/Checkins';
 import Students from '../models/Students';
+import Help_orders from '../models/Help_orders';
 
-class CheckinController {
+class QuestionsStudentsController {
   async index(req, res) {
     const { student_id } = req.params;
 
@@ -13,7 +13,7 @@ class CheckinController {
       return res.status(400).json({ error: 'User not exists' });
     }
 
-    const checkinStudent = await Checkins.findAll({
+    const questions = await Help_orders.findAll({
       where: { student_id },
       include: [
         {
@@ -24,7 +24,7 @@ class CheckinController {
       ],
     });
 
-    return res.json(checkinStudent);
+    return res.json(questions);
   }
 
   async store(req, res) {
@@ -39,15 +39,15 @@ class CheckinController {
       return res.status(400).json({ error: 'User not exists' });
     }
 
-    const checkin = await Checkins.create({
+    const { question } = req.body;
+
+    const help_order = await Help_orders.create({
       student_id,
+      question,
     });
 
-    return res.json({
-      checkin,
-      studentExists,
-    });
+    return res.json(help_order);
   }
 }
 
-export default new CheckinController();
+export default new QuestionsStudentsController();
